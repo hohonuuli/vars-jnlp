@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JNLP File for VARS Query Application -->
+<!-- $Id: varsquery.jnlp,v 1.5 2006/12/04 22:31:20 brian Exp $ -->
+<jnlp codebase="@JNLP_CODEBASE@" href="varsquery.jnlp">
+    <information>
+        <title>VARS Query</title>
+        <vendor>MBARI</vendor>
+        <homepage href="index.html"/>
+        <description>VARS Query Application</description>
+        <icon href="vars/images/query-64.jpg"/>
+        <icon kind="splash" href="vars/images/query-splash.jpg"/>
+        <offline-allowed/>
+        <shortcut>
+            <desktop/>
+            <menu submenu="VARS"/>
+        </shortcut>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.5+" initial-heap-size="64m" max-heap-size="256m"/>
+@QUERY_JAR@
+@LOG4J_CONF_JAR@
+@JNLP_LIBRARIES@
+    </resources>
+    <application-desc main-class="vars.query.ui.App"/>
+</jnlp>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File for VARS Annotation Application -->
+<!-- $Id: varsannotation.jnlp,v 1.7 2006/12/08 00:47:19 brian Exp $ -->
+<jnlp codebase="@JNLP_CODEBASE@" href="varsannotation.jnlp">
+    <information>
+        <title>VARS Annotation</title>
+        <vendor>MBARI</vendor>
+        <homepage href="index.html"/>
+        <description>VARS Annotation Application</description>
+        <icon href="vars/images/annotation-64.jpg"/>
+        <icon kind="splash" href="vars/images/annotation-splash.jpg"/>
+        <offline-allowed/>
+        <shortcut>
+            <desktop/>
+            <menu submenu="VARS"/>
+        </shortcut>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.6+" initial-heap-size="128m" max-heap-size="768m"/>
+@ANNO_JAR@
+@LOG4J_CONF_JAR@
+@JNLP_LIBRARIES@
+    </resources>
+    <resources os="Mac OS X">
+        <!-- Use the 32-bit JVM so that quicktime works -->
+        <j2se version="1.6+" java-vm-args="-d32"/>
+        <jar href="vars/lib/rxtx-2.2pre2.jar"/>
+        <nativelib href="vars/lib/rxtx-native-macosx.jar" />
+    </resources>
+    <resources os="Linux">
+        <jar href="vars/lib/rxtx-2.2pre2.jar"/>
+        <nativelib href="vars/lib/rxtx-native-linux.jar"/>
+    </resources>
+    <resources os="Windows">
+        <!-- RXTX Native libraries -->
+        <jar href="vars/lib/rxtx-2.2pre2.jar"/>
+        <nativelib href="vars/lib/rxtx-native-windows.jar"/>
+    </resources>
+    <application-desc main-class="vars.annotation.ui.App"/>
+</jnlp>

@@ -1,0 +1,200 @@
+<?xml version="1.0" ?>
+<!-- $Id: build.xml,v 1.21 2007/01/05 01:04:43 brian Exp $ -->
+<project 
+    name="vars-redux-jnlp" 
+    default="build" 
+    basedir="." 
+    xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+    
+    <property name="environment" value="mbari"/>
+    <property name="line.separator" value="${line.separator}"/>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         Installs maven ant lib
+    -->
+    <property name="artifact.jar.dir" value="${basedir}/.ant" />
+    <property name="maven.ant.lib" value="maven-ant-tasks-2.1.3.jar" />
+    <property name="artifact.jar.file" value="${artifact.jar.dir}/${maven.ant.lib}" />
+    <mkdir dir="${artifact.jar.dir}"/>
+    <!--
+       download maven antlib from web site so that it can be used even without any
+       special installation
+     -->
+    <available file="${artifact.jar.file}" property="artifact.exists"/>
+    <echo message="Installing Maven Antlib..."/>
+    <get src="http://www.apache.org/dist/maven/ant-tasks/2.1.3/binaries/${maven.ant.lib}"
+         dest="${artifact.jar.file}" usetimestamp="true" ignoreerrors="${artifact.exists}"/>
+
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant">
+        <classpath>
+            <pathelement location="${artifact.jar.file}" />
+        </classpath>
+    </typedef>
+    
+    <artifact:pom id="pom" file="pom.xml" />
+    <property name="version" value="${pom.version}" />
+    <property name="project" value="${pom.artifactId}" />
+    <!-- <property name="build" value="${pom.build.directory}" /> -->
+    <property name="build" value="target" />
+    <property name="site.target" value="${build}/site" />
+    <property name="site.src" value="src/site" />
+    <property name="site.resources" value="${site.src}/resources" />
+    <property name="site.filters" value="${site.src}/filters" />
+    <property name="lib" value="${site.target}/vars/lib" />
+    <property name="rxtx" value="src/site/native" />
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Project targets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    init
+        Sets up the project for build
+
+    -->
+    <target name="init" description="Create the build directory structure">
+        <!-- Create the timestamp -->
+        <tstamp/>
+        
+        <!-- Create the directory build structure used by compile -->
+        <mkdir dir="${build}"/>
+        <mkdir dir="${site.target}"/>
+        <mkdir dir="${lib}"/>
+        
+        <echo>Finding dependencies of ${pom.artifactId}-${version}</echo>
+        <artifact:dependencies filesetId="dependency.fileset" useScope="runtime">
+            <pom refid="pom"/>
+        </artifact:dependencies>
+        <copy todir="${lib}" verbose="true">
+            <fileset refid="dependency.fileset" />
+            <mapper type="flatten" />
+        </copy>
+        <copy todir="${lib}" verbose="true">
+            <fileset dir="${build}">
+                <include name="**/vars-redux-jnlp*.jar"/>
+                <exclude name="**/*sources*" />
+            </fileset>
+        </copy>
+
+        
+        <!-- Format the dependency list for the JNLP file -->
+        <pathconvert pathsep="${line.separator}"
+                     property="jnlp.libraries"
+                     refid="dependency.fileset">
+             <chainedmapper>
+               <mapper type="flatten" />
+               <mapper>
+                 <globmapper from="*" to="        &lt;jar href=&quot;vars/lib/*&quot; /&gt;" />
+               </mapper>
+             </chainedmapper>
+        </pathconvert>
+        
+        <property file="${site.filters}/${environment}.properties"/>
+        
+        <property name="keystore.alias" value="${KEYSTORE_ALIAS}" />
+        <property name="keystore.passwd" value="${KEYSTORE_PASSWD}" />
+        <property name="key.password" value="${KEY_PASSWORD}" />
+        <property name="keystore" value="${KEYSTORE}" />
+        
+        <!-- Filters to be applied to copied objects -->
+        <filterset id="jnlp.filterset">
+            <filter token="ANNO_JAR" value="        &lt;jar href=&quot;vars/lib/vars-annotation-${version}.jar&quot; /&gt;" />
+            <filter token="KB_JAR" value="        &lt;jar href=&quot;vars/lib/vars-knowledgebase-${version}.jar&quot; /&gt;" />
+            <filter token="QUERY_JAR" value="        &lt;jar href=&quot;vars/lib/vars-query-${version}.jar&quot; /&gt;" />
+            <filter token="LOG4J_CONF_JAR" value="        &lt;jar href=&quot;vars/lib/vars-redux-jnlp-${version}.jar&quot; /&gt;" />
+            <filter token="JNLP_CODEBASE" value="${JNLP_CODEBASE}" />
+            <filter token="JNLP_LIBRARIES" value="${jnlp.libraries}" />
+        </filterset>
+        
+    </target>
+
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    clean
+        Delete the ${build} directory trees
+    -->
+    <target name="clean" description="Remove the build directory">
+        <delete dir="${build}" />
+        <delete dir="${artifact.jar.dir}" />
+    </target>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    about
+        Describes the layout of the project
+    -->
+    <target name="about" description="Describes this project">
+        <echo>
+$Id: $
+
+This project uses Maven to fetch dependencies from the internet. To modify these 
+dependencies, edit the pom.xml file. You will need to target a profile by setting the
+environment property on the command line. Acceptable values are: test, shore, pl, wf,
+varspub and eits. For example: ant -Denvironment=test deploy
+
+The setup of the project is as follows:
+ROOT
+|~~ build.xml (this file)
+|~~ pom.xml (dependencies managed by Maven)
+|~~ src
+|   `~~ site
+|       |~~ filters
+|       |~~ native
+|       `~~resources
+`~~ target
+    `~~ site (web site)
+        </echo>
+    </target>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    build
+        Build and deploy a VARS suitable for JNLP deployment that runs against the
+        production database.
+    -->
+    <target name="build"
+            description="Build and deploy a JNLP distribution that runs against the production database"
+            depends="init">
+
+        <!-- Build the native library jars -->
+        <jar jarfile="${lib}/rxtx-native-macosx.jar">
+            <fileset dir="${rxtx}">
+                <include name="*.jnilib" />
+            </fileset>
+        </jar>
+        <jar jarfile="${lib}/rxtx-native-windows.jar">
+            <fileset dir="${rxtx}">
+                <include name="*.dll" />
+            </fileset>
+        </jar>
+
+        <!-- Copy any other related web content. including images -->
+        <copy todir="${site.target}">
+            <fileset dir="${site.src}/resources/">
+                <exclude name="**/*.jnlp" />
+            </fileset>
+        </copy>
+
+        <!-- Copy the JNLP files and apply filters -->
+        <copy todir="${site.target}">
+            <filterset refid="jnlp.filterset" />
+            <fileset dir="${site.src}/resources/">
+                <include name="vars*.jnlp" />
+            </fileset>
+        </copy>
+
+        <!-- Must sign all the jars for JNLP deployments -->
+        <signjar alias="${keystore.alias}" storepass="${keystore.passwd}" 
+            keystore="${keystore}" keypass="${key.password}">
+            <!-- tsaurl="http://tsa.safecreative.org/"> -->
+            <fileset dir="${lib}">
+                <include name="**/*.jar" />
+            </fileset>
+        </signjar>
+        
+    </target>
+    
+    <target name="deploy" description="Deploy VARS webstart application" depends="build" >
+        <copy todir="${JNLP_DEPLOY_DIR}">
+            <fileset dir="${site.target}" />
+        </copy>
+    </target>
+</project>

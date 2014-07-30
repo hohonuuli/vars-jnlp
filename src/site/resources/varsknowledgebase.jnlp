@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JNLP File for VARS Knowledgebase Application -->
+<!-- $Id: varsknowledgebase.jnlp,v 1.6 2006/12/04 22:31:20 brian Exp $ -->
+<jnlp codebase="@JNLP_CODEBASE@" href="varsknowledgebase.jnlp">
+    <information>
+        <title>VARS Knowledgebase</title>
+        <vendor>MBARI</vendor>
+        <homepage href="index.html"/>
+        <description>VARS Knowledgebase Application</description>
+        <icon href="vars/images/knowledgebase-64.jpg"/>
+        <icon kind="splash" href="vars/images/knowledgebase-splash.jpg"/>
+        <offline-allowed/>
+        <shortcut>
+            <desktop/>
+            <menu submenu="VARS"/>
+        </shortcut>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.6+" initial-heap-size="64m" max-heap-size="256m"/>
+@KB_JAR@
+@LOG4J_CONF_JAR@
+@JNLP_LIBRARIES@
+    </resources>
+    <application-desc main-class="vars.knowledgebase.ui.App"/>
+</jnlp>
