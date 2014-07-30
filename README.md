@@ -2,6 +2,10 @@
 
 Build a JNLP enabled set of vars-redux applications.
 
+## Build Prerequisites
+1. [Ant](https://ant.apache.org/)
+2. [Maven](https://maven.apache.org/)
+
 ## How To Use
 
 1. Check out the VARS source code and run `mvn install`. If you're using a custom database you may need to specify a profile to include your database properties. e.g. `mvn install -P dev`.
