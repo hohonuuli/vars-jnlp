@@ -9,7 +9,7 @@ Build a JNLP enabled set of vars-redux applications.
 ## How To Use
 
 1. Check out the VARS source code and run `mvn install`. If you're using a custom database you may need to specify a profile to include your database properties. e.g. `mvn install -P dev`.
-2. [Configure a keystore](https://weblogs.java.net/blog/2005/05/20/signing-jars-javanet-web-start-applications)
+2. [Configure a keystore](https://weblogs.java.net/blog/2005/05/20/signing-jars-javanet-web-start-applications) for signing the jar files.
 3. Modify _src/site/filter/mbari.properties_ with your keystore parameters.
 4. Run the following from a terminal/shell/console: `ant clean;mvn package;ant`. This will generate your JNLP files and signed jars into _target/site_
 
