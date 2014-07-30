@@ -1,6 +1,6 @@
 # VARS-JNLP
 
-Build a JNLP enabled set of vars-redux applications.
+Build a JNLP enabled set of vars applications.
 
 ## Build Prerequisites
 1. [Ant](https://ant.apache.org/)
