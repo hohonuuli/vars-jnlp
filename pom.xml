@@ -4,7 +4,7 @@
     <groupId>org.mbari</groupId>
     <artifactId>vars-redux-jnlp</artifactId>
     <packaging>jar</packaging>
-    <version>7.0.5-SNAPSHOT</version>
+    <version>8.2-SNAPSHOT</version>
     <name>vars-redux-jnlp</name>
     <url>http://maven.apache.org</url>
     <build>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.13</version>
+            <version>1.1.3</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.jtds</groupId>

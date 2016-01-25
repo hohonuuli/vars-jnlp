@@ -182,9 +182,9 @@ ROOT
         </copy>
 
         <!-- Must sign all the jars for JNLP deployments -->
+        <!-- timestamping URL from https://stackoverflow.com/questions/9714798/http-timestamp-verisign-com-scripts-timstamp-dll-not-available -->
         <signjar alias="${keystore.alias}" storepass="${keystore.passwd}" 
-            keystore="${keystore}" keypass="${key.password}">
-            <!-- tsaurl="http://tsa.safecreative.org/"> -->
+            keystore="${keystore}" keypass="${key.password}" tsaurl="https://timestamp.geotrust.com/tsa">
             <fileset dir="${lib}">
                 <include name="**/*.jar" />
             </fileset>
